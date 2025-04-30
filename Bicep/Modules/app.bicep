@@ -53,9 +53,7 @@ module AppService  'br/public:avm/res/web/site:0.15.1' = {
     kind: 'app'
     serverFarmResourceId: AppServicePlan.outputs.resourceId
     virtualNetworkSubnetId:filter(vnet.properties.subnets, (s) => s.name == 'application')[0].id
-
     tags:union({},Module_Tags)
   }
 }
-
 

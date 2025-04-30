@@ -16,6 +16,29 @@ resource Network_RG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
 }
 
 
+
+//Definition and parameters for NAT gateway
+module NATGateway 'br/public:avm/res/network/nat-gateway:1.2.2' = {
+  scope: Network_RG
+  params: {
+    name: '${Deployment_locationCode}-ng-Example'
+    location:Deployment_location
+    zone: 0
+    publicIPAddressObjects:[
+      {
+        name: '-pip-01'
+        skuTier: 'Regional'
+        zones: [
+          1
+          2
+          3
+        ]
+      }
+    ]
+  }
+}
+
+//Definition and parameters for Virtual network
 @description('Requred. List of CIDR ranges to assign to the virtual network. [must be /24 or larger]')
 param VirtualNetwork_addressPrefixes array = [
   '10.0.0.0/23'
@@ -40,6 +63,7 @@ module VirtualNetwork 'br/public:avm/res/network/virtual-network:0.6.1' = {
         name: 'application'
         addressPrefix:cidrSubnet(primaryCIDR.network,25,0)
         delegation:'Microsoft.Web/serverfarms'
+        natGatewayResourceId:NATGateway.outputs.resourceId
       }
       {
         name: 'endpoints'
@@ -50,6 +74,7 @@ module VirtualNetwork 'br/public:avm/res/network/virtual-network:0.6.1' = {
   }
 }
 
+//Definition and parameters for Azure SQL Private DNS Zone
 module PrivateDNSZoneAzureSQL 'br/public:avm/res/network/private-dns-zone:0.7.1' = {
   scope: Network_RG
   params: {

@@ -33,5 +33,8 @@ module database 'Modules/Database.bicep' = {
 }
 
 module application 'Modules/app.bicep' = {
-  
+  params:{
+    Deployment_location: Deployment_location
+    Deployment_locationCode: Deployment_locationCode
+  }
 }

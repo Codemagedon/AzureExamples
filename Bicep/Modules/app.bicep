@@ -53,7 +53,10 @@ module AppService  'br/public:avm/res/web/site:0.15.1' = {
     kind: 'app'
     serverFarmResourceId: AppServicePlan.outputs.resourceId
     virtualNetworkSubnetId:filter(vnet.properties.subnets, (s) => s.name == 'application')[0].id
+    siteConfig:{
+      alwaysOn: true
+      vnetRouteAllEnabled: true
+    }
     tags:union({},Module_Tags)
   }
 }
-

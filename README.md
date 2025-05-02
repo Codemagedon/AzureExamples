@@ -166,6 +166,7 @@
 
 Using an application gateway with a WAF in front of the APIM instance we can secure traffic from a firewall and injection perspective. 
 On the Application Gateway, we can deploy a pair of secondary listener to take in subdomains (https://blue.Example.com && https://green.example.com) which will set custom headers read for APIM to read and apply correct policies to.
+To handle routing to the endpoints we can use a traffic manager to handle the DNS allowing us to Canary traffic to which ever instance is the standby/staging/testing build at the time whilst passing most traffic to the production instance. (using nested profiles we can still complete whatever regional routing split needed and then have seperate routing logic at teh child level to handle Prod/canary traffic splitting.)
 We can then use something along the lines of the below policy to enable this.
 
 

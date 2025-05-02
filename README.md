@@ -162,6 +162,44 @@
 </policies> 
 ```
 
+## Blue-Green policy example
+
+Using an application gateway with a WAF in front of the APIM instance we can secure traffic from a firewall and injection perspective. 
+On the Application Gateway, we can deploy a pair of secondary listener to take in subdomains (https://blue.Example.com && https://green.example.com) which will set custom headers read for APIM to read and apply correct policies to.
+We can then use something along the lines of the below policy to enable this.
+
+
+### Multiple specified Auth endpoints
+```
+<policies>
+  <inbound>
+    <base />
+    <set-variable name="targetApi" value="@(context.Request.Headers.GetValueOrDefault("x-target-api", "").ToLower())" />
+    <choose>
+      <when condition="@(context.Variables["targetApi"] == "green")">
+        <set-backend-service base-url="{{greenURL}}" />
+      </when>
+      <when condition="@(context.Variables["targetApi"] == "blue")">
+        <set-backend-service base-url="{{blueURL}}" />
+      </when>
+      <otherwise>
+        <set-backend-service base-url="{{activeURL}}" />
+      </otherwise>
+    </choose>
+  </inbound>
+  <backend>
+    <!-- statements to be applied before the request is forwarded to 
+         the backend service go here -->
+  </backend>
+  <outbound>
+    <!-- statements to be applied to the response go here -->
+  </outbound>
+  <on-error>
+    <!-- statements to be applied if there is an error condition go here -->
+  </on-error>
+</policies> 
+```
+
 ## Useful Links
 ### Entra Identity platform references
 [Entra ID token Claims](https://learn.microsoft.com/en-us/entra/identity-platform/id-token-claims-reference)  
@@ -170,3 +208,5 @@
 [validate-azure-ad-token](https://learn.microsoft.com/en-us/azure/api-management/validate-azure-ad-token-policy)  
 [set-variable](https://learn.microsoft.com/en-us/azure/api-management/set-variable-policy)  
 [choose](https://learn.microsoft.com/en-us/azure/api-management/choose-policy)  
+### Blog sources
+[How to do blue-green testing with API Management and Azure Application Gateway](https://borzenin.com/blue-green-azure-application-gateway/)
